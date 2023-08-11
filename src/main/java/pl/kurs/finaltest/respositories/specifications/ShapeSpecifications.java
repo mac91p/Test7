@@ -92,21 +92,14 @@ public class ShapeSpecifications {
     }
 
     public static Specification<Shape> byCreatedAt(LocalDateTime from, LocalDateTime to) {
-        return (root, query, criteriaBuilder) -> {
-            if (from != null && to != null) {
-                return criteriaBuilder.between(root.get("createdAt"), from, to);
-            } else if (from != null) {
-                return criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), from);
-            } else if (to != null) {
-                return criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), to);
-            }
-            return null;
-        };
+        return (root, query, criteriaBuilder) ->
+                createSpecificationForRange(from, to, "createdAt", root)
+                        .toPredicate(root, query, criteriaBuilder);
     }
 
-    private static Specification<Shape> createSpecificationForRange(
-            Double from,
-            Double to,
+    private static <T extends Comparable<? super T>> Specification<Shape> createSpecificationForRange(
+            T from,
+            T to,
             String paramName,
             Root<? extends Shape> shapeRoot) {
         return (root, query, criteriaBuilder) -> {

@@ -2,6 +2,7 @@ package pl.kurs.finaltest.controllers;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,8 +61,8 @@ public class ShapeController {
             @RequestParam(required = false) Double radiusTo,
             @RequestParam(required = false) Double lengthFrom,
             @RequestParam(required = false) Double lengthTo,
-            @RequestParam(required = false) LocalDateTime createdAtFrom,
-            @RequestParam(required = false) LocalDateTime createdAtTo) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdAtFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdAtTo) {
         Specification<Shape> spec = shapeManagementService.createShapeSpecification(type, createdBy, areaFrom, areaTo,
                 perimeterFrom, perimeterTo, widthFrom, widthTo, heightFrom, heightTo, radiusFrom, radiusTo,lengthFrom,
                 lengthTo, createdAtFrom, createdAtTo);
