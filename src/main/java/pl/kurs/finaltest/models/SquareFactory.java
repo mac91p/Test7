@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Component
-public class SquareFactory implements ShapeFactory {
+public class SquareFactory implements IShapeFactory {
 
     @Override
     public Shape createShape(CreateShapeCommand command, String username) {

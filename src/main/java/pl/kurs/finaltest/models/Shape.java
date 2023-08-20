@@ -1,5 +1,7 @@
 package pl.kurs.finaltest.models;
 
+import com.querydsl.core.annotations.Generated;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -26,8 +28,7 @@ public abstract class Shape implements Serializable {
     private String lastModifiedBy;
     @Column(nullable = false)
     private LocalDateTime lastModifiedAt;
-    private double area;
-    private double perimeter;
+
 
     public Shape() {
     }
@@ -38,8 +39,6 @@ public abstract class Shape implements Serializable {
         this.createdAt = createdAt;
         this.lastModifiedBy = lastModifiedBy;
         this.lastModifiedAt = lastModifiedAt;
-        this.area = calculateArea();
-        this.perimeter = calculatePerimeter();
     }
 
     public abstract double calculateArea();
@@ -70,21 +69,6 @@ public abstract class Shape implements Serializable {
         this.lastModifiedAt = lastModifiedAt;
     }
 
-    public double getArea() {
-        return area;
-    }
-
-    public void setArea(double diameter) {
-        this.area = diameter;
-    }
-
-    public double getPerimeter() {
-        return perimeter;
-    }
-
-    public void setPerimeter(double perimeter) {
-        this.perimeter = perimeter;
-    }
 
     public String getType() {
         return type;
@@ -118,16 +102,17 @@ public abstract class Shape implements Serializable {
         this.version = version;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Shape shape = (Shape) o;
-        return Objects.equals(type, shape.type) && Objects.equals(createdBy, shape.createdBy) && Objects.equals(createdAt, shape.createdAt) && Objects.equals(lastModifiedBy, shape.lastModifiedBy) && Objects.equals(lastModifiedAt, shape.lastModifiedAt);
+        return Objects.equals(id, shape.id) && Objects.equals(type, shape.type) && Objects.equals(version, shape.version) && Objects.equals(createdBy, shape.createdBy) && Objects.equals(createdAt, shape.createdAt) && Objects.equals(lastModifiedBy, shape.lastModifiedBy) && Objects.equals(lastModifiedAt, shape.lastModifiedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, createdBy, createdAt, lastModifiedBy, lastModifiedAt);
+        return Objects.hash(id, type, version, createdBy, createdAt, lastModifiedBy, lastModifiedAt);
     }
 }

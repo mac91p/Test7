@@ -12,8 +12,6 @@ public abstract class ShapeDto {
     private LocalDateTime createdAt;
     private LocalDateTime lastModifiedAt;
     private String lastModifiedBy;
-    private Double area;
-    private Double perimeter;
 
     public Long getId() {
         return id;
@@ -71,19 +69,5 @@ public abstract class ShapeDto {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public Double getArea() {
-        return area;
-    }
 
-    public void setArea(Double area) {
-        this.area = area;
-    }
-
-    public Double getPerimeter() {
-        return perimeter;
-    }
-
-    public void setPerimeter(Double perimeter) {
-        this.perimeter = perimeter;
-    }
 }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Component
-public class CircleFactory implements ShapeFactory{
+public class CircleFactory implements IShapeFactory {
     @Override
     public Shape createShape(CreateShapeCommand command, String userName) {
         if ("CIRCLE".equalsIgnoreCase(command.getType())) {
@@ -19,10 +19,10 @@ public class CircleFactory implements ShapeFactory{
                 circle.setCreatedBy(userName);
                 circle.setLastModifiedBy(userName);
                 circle.setRadius(radius);
-                circle.setCreatedAt(LocalDateTime.now());
-                circle.setLastModifiedAt(LocalDateTime.now());
                 circle.setArea(circle.calculateArea());
                 circle.setPerimeter(circle.calculatePerimeter());
+                circle.setCreatedAt(LocalDateTime.now());
+                circle.setLastModifiedAt(LocalDateTime.now());
                 return circle;
             }
             throw new IllegalArgumentException("Invalid parameters for this shape");

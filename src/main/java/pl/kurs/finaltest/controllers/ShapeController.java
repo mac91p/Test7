@@ -1,19 +1,19 @@
 package pl.kurs.finaltest.controllers;
 
+import com.querydsl.core.types.Predicate;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.kurs.finaltest.commands.CreateShapeCommand;
 import pl.kurs.finaltest.dto.ShapeDto;
-import pl.kurs.finaltest.models.Shape;
-import pl.kurs.finaltest.models.ShapeFactory;
+import pl.kurs.finaltest.models.*;
+import pl.kurs.finaltest.respositories.predicates.*;
 import pl.kurs.finaltest.services.ShapeFactoryService;
 import pl.kurs.finaltest.security.AuthenticationProvider;
 import pl.kurs.finaltest.services.ShapeManagementService;
-import java.time.LocalDateTime;
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +38,7 @@ public class ShapeController {
     @PostMapping
     public ResponseEntity<ShapeDto> createShape(@RequestBody CreateShapeCommand createShapeCommand) {
         String username = authenticationProvider.getUsername();
-        ShapeFactory matchingFactory = shapeFactoryService.getFactory(createShapeCommand.getType());
+        IShapeFactory matchingFactory = shapeFactoryService.getFactory(createShapeCommand.getType());
         Shape newShape = matchingFactory.createShape(createShapeCommand, username);
         shapeManagementService.add(newShape);
         ShapeDto shapeDto = mapper.map(newShape, matchingFactory.createShapeDto(newShape).getClass());
@@ -46,35 +46,24 @@ public class ShapeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ShapeDto>> getShapesByParameters(
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String createdBy,
-            @RequestParam(required = false) Double areaFrom,
-            @RequestParam(required = false) Double areaTo,
-            @RequestParam(required = false) Double perimeterFrom,
-            @RequestParam(required = false) Double perimeterTo,
-            @RequestParam(required = false) Double widthFrom,
-            @RequestParam(required = false) Double widthTo,
-            @RequestParam(required = false) Double heightFrom,
-            @RequestParam(required = false) Double heightTo,
-            @RequestParam(required = false) Double radiusFrom,
-            @RequestParam(required = false) Double radiusTo,
-            @RequestParam(required = false) Double lengthFrom,
-            @RequestParam(required = false) Double lengthTo,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdAtFrom,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime createdAtTo) {
-        Specification<Shape> spec = shapeManagementService.createShapeSpecification(type, createdBy, areaFrom, areaTo,
-                perimeterFrom, perimeterTo, widthFrom, widthTo, heightFrom, heightTo, radiusFrom, radiusTo,lengthFrom,
-                lengthTo, createdAtFrom, createdAtTo);
-        List<ShapeDto> allShapes = shapeManagementService.getAllBySpec(spec).stream()
+    public ResponseEntity<List<ShapeDto>> getShapes(@Valid ShapeParameters shapeParameters) {
+        Predicate circlePredicate = CirclePredicate.createCirclePredicate(shapeParameters);
+        Predicate rectanglePredicate = RectanglePredicate.createRectanglePredicate(shapeParameters);
+        Predicate squarePredicate = SquarePredicate.createSquarePredicate(shapeParameters);
+        List<Circle> circleList = shapeManagementService.getCircles(circlePredicate);
+        List<Square> squareList = shapeManagementService.getSquares(squarePredicate);
+        List<Rectangle> rectangleList = shapeManagementService.getRectangles(rectanglePredicate);
+        List<Shape> allShapes = new ArrayList<>();
+        allShapes.addAll(circleList);
+        allShapes.addAll(squareList);
+        allShapes.addAll(rectangleList);
+        List<ShapeDto> allShapesDto = allShapes.stream()
                 .map(x -> {
-                    ShapeFactory shapeFactory = shapeFactoryService.getFactory(x.getType());
+                    IShapeFactory shapeFactory = shapeFactoryService.getFactory(x.getType());
                     return mapper.map(x, shapeFactory.createShapeDto(x).getClass());
                 })
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(allShapes);
+        return ResponseEntity.status(HttpStatus.OK).body(allShapesDto);
+
     }
-
-
-
 }

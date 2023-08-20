@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Component
-public class RectangleFactory implements ShapeFactory {
+public class RectangleFactory implements IShapeFactory {
 
     @Override
     public Shape createShape(CreateShapeCommand command, String username) {
@@ -22,10 +22,10 @@ public class RectangleFactory implements ShapeFactory {
                 rectangle.setCreatedBy(username);
                 rectangle.setWidth(width);
                 rectangle.setHeight(height);
-                rectangle.setCreatedAt(LocalDateTime.now());
-                rectangle.setLastModifiedAt(LocalDateTime.now());
                 rectangle.setArea(rectangle.calculateArea());
                 rectangle.setPerimeter(rectangle.calculatePerimeter());
+                rectangle.setCreatedAt(LocalDateTime.now());
+                rectangle.setLastModifiedAt(LocalDateTime.now());
                 return rectangle;
             }
             throw new IllegalArgumentException("Invalid parameters for this type of shape");
