@@ -1,12 +1,13 @@
 package pl.kurs.finaltest.respositories.predicates;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import pl.kurs.finaltest.generated.pl.kurs.finaltest.models.QSquare;
 import pl.kurs.finaltest.models.*;
 
-public class SquarePredicate {
+public class SquarePredicate  {
 
-    public static com.querydsl.core.types.Predicate createSquarePredicate(ShapeParameters parameters) {
+    public static Predicate createShapePredicate(ShapeParameters parameters) {
         QSquare qqSquare = QSquare.square;
         BooleanBuilder builder = new BooleanBuilder();
 

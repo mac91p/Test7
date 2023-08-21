@@ -1,12 +1,13 @@
 package pl.kurs.finaltest.respositories.predicates;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import pl.kurs.finaltest.generated.pl.kurs.finaltest.models.QCircle;
 import pl.kurs.finaltest.models.ShapeParameters;
 
 public class CirclePredicate {
 
-    public static com.querydsl.core.types.Predicate createCirclePredicate(ShapeParameters parameters) {
+    public static Predicate createShapePredicate(ShapeParameters parameters) {
         QCircle qCircle = QCircle.circle;
         BooleanBuilder builder = new BooleanBuilder();
 

@@ -1,13 +1,13 @@
 package pl.kurs.finaltest.respositories.predicates;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import pl.kurs.finaltest.generated.pl.kurs.finaltest.models.QRectangle;
 import pl.kurs.finaltest.models.*;
 
-public class RectanglePredicate {
+public class RectanglePredicate  {
 
-
-    public static com.querydsl.core.types.Predicate createRectanglePredicate(ShapeParameters parameters) {
+    public static Predicate createRectanglePredicate(ShapeParameters parameters) {
         QRectangle qRectangle = QRectangle.rectangle;
         BooleanBuilder builder = new BooleanBuilder();
 

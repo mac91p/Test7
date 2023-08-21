@@ -1,47 +1,33 @@
 package pl.kurs.finaltest.services;
 
-
-import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.kurs.finaltest.generated.pl.kurs.finaltest.models.QCircle;
-import pl.kurs.finaltest.generated.pl.kurs.finaltest.models.QRectangle;
-import pl.kurs.finaltest.generated.pl.kurs.finaltest.models.QSquare;
 import pl.kurs.finaltest.models.*;
 import pl.kurs.finaltest.respositories.ShapeRepository;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ShapeManagementService extends AbstractGenericManagementService<Shape, ShapeRepository> {
 
+    private final List<IShapeProviderService> shapeProviderServices;
     private final JPAQueryFactory queryFactory;
 
-
-    public ShapeManagementService(ShapeRepository repository, JPAQueryFactory queryFactory) {
+    @Autowired
+    public ShapeManagementService(ShapeRepository repository, List<IShapeProviderService> shapeProviderServices, JPAQueryFactory queryFactory) {
         super(repository);
+        this.shapeProviderServices = shapeProviderServices;
         this.queryFactory = queryFactory;
     }
 
-
-    public List<Circle> getCircles(Predicate predicate) {
-        return  queryFactory
-                .selectFrom(QCircle.circle)
-                .where(predicate)
-                .fetch();
-    }
-
-    public List<Square> getSquares(Predicate predicate) {
-        return  queryFactory
-                .selectFrom(QSquare.square)
-                .where(predicate)
-                .fetch();
-    }
-
-    public List<Rectangle> getRectangles(Predicate predicate) {
-        return  queryFactory
-                .selectFrom(QRectangle.rectangle)
-                .where(predicate)
-                .fetch();
+    public List<Shape> getAllShapes(ShapeParameters shapeParameters) {
+        List<Shape> allShapes = new ArrayList<>();
+        for (IShapeProviderService shapeProviderService : shapeProviderServices) {
+            List<? extends Shape> shapes = shapeProviderService.getShapes(shapeParameters, queryFactory);
+            allShapes.addAll(shapes);
+        }
+        return allShapes;
     }
 
 }
