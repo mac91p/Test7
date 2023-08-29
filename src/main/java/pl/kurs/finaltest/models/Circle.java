@@ -1,12 +1,16 @@
 package pl.kurs.finaltest.models;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
 @Table(name = "circles")
+@EntityListeners(AuditingEntityListener.class)
 public class Circle extends Shape implements Serializable {
 
     private double radius;
@@ -16,11 +20,11 @@ public class Circle extends Shape implements Serializable {
     public Circle(){
     }
 
-    public Circle(String type, String createdBy, LocalDateTime createdAt, String lastModifiedBy, LocalDateTime lastModifiedAt, double radius, double area, double perimeter) {
+    public Circle(String type, String createdBy, Instant createdAt, String lastModifiedBy, Instant lastModifiedAt, double radius, double area, double perimeter) {
         super(type, createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.radius = radius;
-        this.area = calculateArea();
-        this.perimeter = calculatePerimeter();
+        this.area = area;
+        this.perimeter = perimeter;
     }
 
     @Override

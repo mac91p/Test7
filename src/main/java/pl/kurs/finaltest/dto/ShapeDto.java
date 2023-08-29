@@ -1,7 +1,6 @@
 package pl.kurs.finaltest.dto;
 
-
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public abstract class ShapeDto {
 
@@ -9,8 +8,8 @@ public abstract class ShapeDto {
     private String type;
     private Integer version;
     private String createdBy;
-    private LocalDateTime createdAt;
-    private LocalDateTime lastModifiedAt;
+    private Instant createdAt;
+    private Instant lastModifiedAt;
     private String lastModifiedBy;
 
     public Long getId() {
@@ -45,19 +44,19 @@ public abstract class ShapeDto {
         this.createdBy = createdBy;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getLastModifiedAt() {
+    public Instant getLastModifiedAt() {
         return lastModifiedAt;
     }
 
-    public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
+    public void setLastModifiedAt(Instant lastModifiedAt) {
         this.lastModifiedAt = lastModifiedAt;
     }
 

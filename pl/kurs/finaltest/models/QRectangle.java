@@ -25,7 +25,7 @@ public class QRectangle extends EntityPathBase<Rectangle> {
     public final NumberPath<Double> area = createNumber("area", Double.class);
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+    public final DateTimePath<java.time.Instant> createdAt = _super.createdAt;
 
     //inherited
     public final StringPath createdBy = _super.createdBy;
@@ -36,7 +36,7 @@ public class QRectangle extends EntityPathBase<Rectangle> {
     public final NumberPath<Long> id = _super.id;
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = _super.lastModifiedAt;
+    public final DateTimePath<java.time.Instant> lastModifiedAt = _super.lastModifiedAt;
 
     //inherited
     public final StringPath lastModifiedBy = _super.lastModifiedBy;

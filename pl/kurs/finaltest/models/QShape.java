@@ -3,7 +3,6 @@ package pl.kurs.finaltest.generated.pl.kurs.finaltest.models;
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
 import com.querydsl.core.types.dsl.*;
-
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
@@ -20,13 +19,13 @@ public class QShape extends EntityPathBase<Shape> {
 
     public static final QShape shape = new QShape("shape");
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+    public final DateTimePath<java.time.Instant> createdAt = createDateTime("createdAt", java.time.Instant.class);
 
     public final StringPath createdBy = createString("createdBy");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final DateTimePath<java.time.LocalDateTime> lastModifiedAt = createDateTime("lastModifiedAt", java.time.LocalDateTime.class);
+    public final DateTimePath<java.time.Instant> lastModifiedAt = createDateTime("lastModifiedAt", java.time.Instant.class);
 
     public final StringPath lastModifiedBy = createString("lastModifiedBy");
 

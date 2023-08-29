@@ -7,6 +7,7 @@ import pl.kurs.finaltest.models.*;
 import pl.kurs.finaltest.respositories.ShapeRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ShapeManagementService extends AbstractGenericManagementService<Shape, ShapeRepository> {
@@ -21,10 +22,11 @@ public class ShapeManagementService extends AbstractGenericManagementService<Sha
         this.queryFactory = queryFactory;
     }
 
-    public List<Shape> getAllShapes(ShapeParameters shapeParameters) {
+
+    public List<Shape> getAllShapes(Map<String, String> queryParams) {
         List<Shape> allShapes = new ArrayList<>();
         for (IShapeProviderService shapeProviderService : shapeProviderServices) {
-            List<? extends Shape> shapes = shapeProviderService.getShapes(shapeParameters, queryFactory);
+            List<? extends Shape> shapes = shapeProviderService.getShapes(queryParams, queryFactory);
             allShapes.addAll(shapes);
         }
         return allShapes;

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+
 @Configuration
 @ComponentScan(basePackages = "pl.kurs.finaltest.models")
 public class BeansConfig {
@@ -17,9 +18,7 @@ public class BeansConfig {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper;
     }
-
-
-
-
 }
+
+
 

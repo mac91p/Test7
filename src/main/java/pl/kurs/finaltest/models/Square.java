@@ -1,14 +1,16 @@
 package pl.kurs.finaltest.models;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.stereotype.Component;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
 @Table(name = "squares")
-@Component
+@EntityListeners(AuditingEntityListener.class)
 public class Square extends Shape implements Serializable {
 
     private double length;
@@ -18,11 +20,11 @@ public class Square extends Shape implements Serializable {
     public Square() {
     }
 
-    public Square(String type, String createdBy, LocalDateTime createdAt, String lastModifiedBy, LocalDateTime lastModifiedAt, double length, double area, double perimeter) {
+    public Square(String type, String createdBy, Instant createdAt, String lastModifiedBy, Instant lastModifiedAt, double length, double area, double perimeter) {
         super(type, createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.length = length;
-        this.area = calculateArea();
-        this.perimeter = calculatePerimeter();
+        this.area = area;
+        this.perimeter = perimeter;
     }
 
     public double getLength() {
@@ -61,7 +63,6 @@ public class Square extends Shape implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;

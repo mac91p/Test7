@@ -64,9 +64,11 @@
             <artifactId>querydsl-apt</artifactId>
             <version>5.0.0</version>
         </dependency>
-
-
-
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.11.4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -85,7 +87,7 @@
                             <goal>process</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>src/main/java/pl/kurs/finaltest/generated</outputDirectory>
+                            <outputDirectory>src/main/java/pl/kurs/finaltest/models/generated</outputDirectory>
                             <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
                         </configuration>
                     </execution>

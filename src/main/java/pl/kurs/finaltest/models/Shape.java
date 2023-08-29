@@ -1,15 +1,20 @@
 package pl.kurs.finaltest.models;
 
-import com.querydsl.core.annotations.Generated;
-
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "shapes")
+@EntityListeners(AuditingEntityListener.class)
 public abstract class Shape implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -21,19 +26,23 @@ public abstract class Shape implements Serializable {
     @Version
     private Long version;
     @Column(nullable = false)
+    @CreatedBy
     private String createdBy;
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    @CreatedDate
+    private Instant createdAt;
     @Column(nullable = false)
+    @LastModifiedBy
     private String lastModifiedBy;
     @Column(nullable = false)
-    private LocalDateTime lastModifiedAt;
+    @LastModifiedDate
+    private Instant lastModifiedAt;
 
 
     public Shape() {
     }
 
-    public Shape(String type, String createdBy, LocalDateTime createdAt, String lastModifiedBy, LocalDateTime lastModifiedAt) {
+    public Shape(String type, String createdBy, Instant createdAt, String lastModifiedBy, Instant lastModifiedAt) {
         this.type = type;
         this.createdBy = createdBy;
         this.createdAt = createdAt;
@@ -61,14 +70,21 @@ public abstract class Shape implements Serializable {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedAt() {
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getLastModifiedAt() {
         return lastModifiedAt;
     }
 
-    public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
+    public void setLastModifiedAt(Instant lastModifiedAt) {
         this.lastModifiedAt = lastModifiedAt;
     }
-
 
     public String getType() {
         return type;
@@ -84,14 +100,6 @@ public abstract class Shape implements Serializable {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     public Long getVersion() {

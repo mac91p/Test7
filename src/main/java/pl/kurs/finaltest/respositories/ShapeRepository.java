@@ -5,6 +5,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import pl.kurs.finaltest.models.Shape;
 
 
+
 public interface ShapeRepository extends JpaRepository<Shape, Long>, QuerydslPredicateExecutor<Shape> {
 
 }

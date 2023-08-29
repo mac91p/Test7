@@ -6,9 +6,9 @@ import pl.kurs.finaltest.dto.ShapeDto;
 
 public interface IShapeFactory {
 
-    Shape createShape(CreateShapeCommand command, String userName);
+    Shape createShape(CreateShapeCommand command);
     String getSupportedType();
-    ShapeDto createShapeDto(Shape shape);
+    Class<? extends ShapeDto> createShapeDto(Shape shape);
 
 
 }

@@ -2,51 +2,72 @@ package pl.kurs.finaltest.respositories.predicates;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import pl.kurs.finaltest.generated.pl.kurs.finaltest.models.QRectangle;
-import pl.kurs.finaltest.models.*;
+import org.springframework.stereotype.Component;
+import pl.kurs.finaltest.models.QRectangle;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 
-public class RectanglePredicate  {
+@Component
+public class RectanglePredicate implements IShapePredicate {
 
-    public static Predicate createRectanglePredicate(ShapeParameters parameters) {
+    @Override
+    public List<String> supportedParameters() {
+        return List.of("heightFrom", "heightTo", "widthFrom", "widthTo", "areFrom", "areaTo", "perimeterFrom", "perimeterTo",
+                "createdBy", "createdAtFrom", "createdAtTo", "type");
+    }
+
+    @Override
+    public Predicate createPredicate(Map<String, String> queryParams) {
         QRectangle qRectangle = QRectangle.rectangle;
         BooleanBuilder builder = new BooleanBuilder();
-
-        if (parameters.getHeightFrom() != null) {
-            builder.and(qRectangle.height.goe(parameters.getHeightFrom()));
+        boolean hasUnsupportedParameters = queryParams.keySet().stream()
+                .anyMatch(x -> !supportedParameters().contains(x));
+        if (hasUnsupportedParameters) {
+            return qRectangle.isNull();
+        } else {
+            if (queryParams.containsKey("widthFrom")) {
+                builder.and(qRectangle.width.goe(Double.parseDouble(queryParams.get("widthFrom"))));
+            }
+            if (queryParams.containsKey("widthTo")) {
+                builder.and(qRectangle.width.loe(Double.parseDouble(queryParams.get("widthTo"))));
+            }
+            if (queryParams.containsKey("heightFrom")) {
+                builder.and(qRectangle.height.goe(Double.parseDouble(queryParams.get("heightFrom"))));
+            }
+            if (queryParams.containsKey("heightTo")) {
+                builder.and(qRectangle.height.loe(Double.parseDouble(queryParams.get("heightTo"))));
+            }
+            if (queryParams.containsKey("areaFrom")) {
+                builder.and(qRectangle.area.goe(Double.parseDouble(queryParams.get("areaFrom"))));
+            }
+            if (queryParams.containsKey("areaTo")) {
+                builder.and(qRectangle.area.loe(Double.parseDouble(queryParams.get("areaTo"))));
+            }
+            if (queryParams.containsKey("perimeterFrom")) {
+                builder.and(qRectangle.perimeter.goe(Double.parseDouble(queryParams.get("perimeterFrom"))));
+            }
+            if (queryParams.containsKey("perimeterTo")) {
+                builder.and(qRectangle.perimeter.goe(Double.parseDouble(queryParams.get("perimeterTo"))));
+            }
+            if (queryParams.containsKey("type")) {
+                builder.and(qRectangle.type.eq(queryParams.get("type")));
+            }
+            if (queryParams.containsKey("createdBy")) {
+                builder.and(qRectangle.createdBy.eq(queryParams.get("createdBy")));
+            }
+            if (queryParams.containsKey("createdAtFrom")) {
+                String createdAtFromString = queryParams.get("createdAtFrom");
+                Instant createdAtFrom = Instant.parse(createdAtFromString);
+                builder.and(qRectangle.createdAt.goe(createdAtFrom));
+            }
+            if (queryParams.containsKey("createdAtTo")) {
+                String createdAtFromString = queryParams.get("createdAtTo");
+                Instant createdAtFrom = Instant.parse(createdAtFromString);
+                builder.and(qRectangle.createdAt.loe(createdAtFrom));
+            }
+            return builder.getValue();
         }
-        if (parameters.getHeightTo() != null) {
-            builder.and(qRectangle.height.loe(parameters.getHeightTo()));
-        }
-        if (parameters.getWidthFrom() != null) {
-            builder.and(qRectangle.width.goe(parameters.getWidthFrom()));
-        }
-        if (parameters.getWidthTo() != null) {
-            builder.and(qRectangle.width.loe(parameters.getWidthTo()));
-        }
-        if (parameters.getAreaFrom() != null) {
-            builder.and(qRectangle.area.goe(parameters.getAreaFrom()));
-        }
-        if (parameters.getAreaTo() != null) {
-            builder.and(qRectangle.area.loe(parameters.getAreaTo()));
-        }
-        if (parameters.getPerimeterFrom() != null) {
-            builder.and(qRectangle.perimeter.goe(parameters.getPerimeterFrom()));
-        }
-        if (parameters.getPerimeterTo() != null) {
-            builder.and(qRectangle.perimeter.loe(parameters.getPerimeterTo()));
-        }
-        if (parameters.getType() != null) {
-            builder.and(qRectangle.type.eq(parameters.getType()));
-        }
-        if (parameters.getCreatedBy() != null) {
-            builder.and(qRectangle.createdBy.eq(parameters.getCreatedBy()));
-        }
-        if (parameters.getCreatedAtFrom() != null) {
-            builder.and(qRectangle.createdAt.goe(parameters.getCreatedAtFrom()));
-        }
-        if (parameters.getCreatedAtTo() != null) {
-            builder.and(qRectangle.createdAt.loe(parameters.getCreatedAtTo()));
-        }
-        return builder.getValue();
     }
 }
+

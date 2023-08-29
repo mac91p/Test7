@@ -1,15 +1,17 @@
 package pl.kurs.finaltest.models;
 
 ;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.stereotype.Component;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
 @Table(name = "rectangles")
-@Component
+@EntityListeners(AuditingEntityListener.class)
 public class Rectangle  extends Shape implements Serializable {
 
     private double width;
@@ -20,12 +22,12 @@ public class Rectangle  extends Shape implements Serializable {
     public Rectangle() {
     }
 
-    public Rectangle(String type, String createdBy, LocalDateTime createdAt, String lastModifiedBy, LocalDateTime lastModifiedAt, double width, double height, double area, double perimeter) {
+    public Rectangle(String type, String createdBy, Instant createdAt, String lastModifiedBy, Instant lastModifiedAt, double width, double height, double area, double perimeter) {
         super(type, createdBy, createdAt, lastModifiedBy, lastModifiedAt);
         this.width = width;
         this.height = height;
-        this.area = calculateArea();
-        this.perimeter = calculatePerimeter();
+        this.area = area;
+        this.perimeter = perimeter;
     }
 
     public double getWidth() {
