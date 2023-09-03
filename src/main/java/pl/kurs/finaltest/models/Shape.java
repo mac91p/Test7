@@ -8,11 +8,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Table(name = "shapes")
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Shape implements Serializable {
@@ -50,9 +49,6 @@ public abstract class Shape implements Serializable {
         this.lastModifiedAt = lastModifiedAt;
     }
 
-    public abstract double calculateArea();
-
-    public abstract double calculatePerimeter();
 
     public Long getId() {
         return id;

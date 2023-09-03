@@ -1,10 +1,13 @@
 package pl.kurs.finaltest.respositories.predicates;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Component;
-import pl.kurs.finaltest.models.QSquare;
-import java.time.Instant;
+import pl.kurs.finaltest.models.Shape;
+import pl.kurs.finaltest.models.Square;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,55 +16,41 @@ public class SquarePredicate implements IShapePredicate {
 
     @Override
     public List<String> supportedParameters() {
-        return List.of("lengthFrom", "lengthTo", "areFrom", "areaTo", "perimeterFrom", "perimeterTo",
-                "createdBy", "createdAtFrom", "createdAtTo", "type");
+        return List.of("lengthFrom", "lengthTo", "areaFrom", "areaTo", "perimeterFrom", "perimeterTo");
     }
 
     @Override
-    public Predicate createPredicate(Map<String, String> queryParams) {
-        QSquare qSquare = QSquare.square;
-        BooleanBuilder builder = new BooleanBuilder();
-        boolean hasUnsupportedParameters = queryParams.keySet().stream()
+    public Boolean supportedParams(Map<String, String> parameters) {
+        return parameters.keySet().stream()
                 .anyMatch(x -> !supportedParameters().contains(x));
-        if (hasUnsupportedParameters) {
-            return qSquare.isNull();
-        } else {
+    }
 
-            if (queryParams.containsKey("lengthFrom")) {
-                builder.and(qSquare.length.goe(Double.parseDouble(queryParams.get("lengthFrom"))));
-            }
-            if (queryParams.containsKey("lengthTo")) {
-                builder.and(qSquare.length.loe(Double.parseDouble(queryParams.get("lengthTo"))));
-            }
-            if (queryParams.containsKey("areaFrom")) {
-                builder.and(qSquare.area.goe(Double.parseDouble(queryParams.get("areaFrom"))));
-            }
-            if (queryParams.containsKey("areaTo")) {
-                builder.and(qSquare.area.loe(Double.parseDouble(queryParams.get("areaTo"))));
-            }
-            if (queryParams.containsKey("perimeterFrom")) {
-                builder.and(qSquare.perimeter.goe(Double.parseDouble(queryParams.get("perimeterFrom"))));
-            }
-            if (queryParams.containsKey("perimeterTo")) {
-                builder.and(qSquare.perimeter.goe(Double.parseDouble(queryParams.get("perimeterTo"))));
-            }
-            if (queryParams.containsKey("type")) {
-                builder.and(qSquare.type.eq(queryParams.get("type")));
-            }
-            if (queryParams.containsKey("createdBy")) {
-                builder.and(qSquare.createdBy.eq(queryParams.get("createdBy")));
-            }
-            if (queryParams.containsKey("createdAtFrom")) {
-                String createdAtFromString = queryParams.get("createdAtFrom");
-                Instant createdAtFrom = Instant.parse(createdAtFromString);
-                builder.and(qSquare.createdAt.goe(createdAtFrom));
-            }
-            if (queryParams.containsKey("createdAtTo")) {
-                String createdAtFromString = queryParams.get("createdAtTo");
-                Instant createdAtFrom = Instant.parse(createdAtFromString);
-                builder.and(qSquare.createdAt.loe(createdAtFrom));
-            }
-            return builder.getValue();
+    @Override
+    public Predicate buildPredicate(Root<Shape> root, CriteriaBuilder cb, Map<String, String> queryParams) {
+        Root<Square> squareRoot = cb.treat(root, Square.class);
+        Expression<Double> length = squareRoot.get("length").as(Double.class);
+        Expression<Double> area = cb.prod(length, length);
+        Expression<Double> perimeter = cb.prod(cb.literal(4.0), length);
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (queryParams.containsKey("lengthFrom")) {
+            predicates.add(cb.greaterThanOrEqualTo(squareRoot.get("length"), Double.valueOf(queryParams.get("lengthFrom"))));
         }
+        if (queryParams.containsKey("lengthTo")) {
+            predicates.add(cb.lessThanOrEqualTo(squareRoot.get("length"), Double.valueOf(queryParams.get("lengthTo"))));
+        }
+        if (queryParams.containsKey("areaFrom")) {
+            predicates.add(cb.greaterThanOrEqualTo(area.as(Double.class), Double.valueOf(queryParams.get("areaFrom"))));
+        }
+        if (queryParams.containsKey("areaTo")) {
+            predicates.add(cb.lessThanOrEqualTo(area.as(Double.class), Double.valueOf(queryParams.get("areaTo"))));
+        }
+        if (queryParams.containsKey("perimeterFrom")) {
+            predicates.add(cb.greaterThanOrEqualTo(perimeter.as(Double.class), Double.valueOf(queryParams.get("perimeterFrom"))));
+        }
+        if (queryParams.containsKey("perimeterTo")) {
+            predicates.add(cb.lessThanOrEqualTo(perimeter.as(Double.class), Double.valueOf(queryParams.get("perimeterTo"))));
+        }
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
 }

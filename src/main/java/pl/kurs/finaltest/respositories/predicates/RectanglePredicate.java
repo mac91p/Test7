@@ -1,10 +1,13 @@
 package pl.kurs.finaltest.respositories.predicates;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Component;
-import pl.kurs.finaltest.models.QRectangle;
-import java.time.Instant;
+import pl.kurs.finaltest.models.Rectangle;
+import pl.kurs.finaltest.models.Shape;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,61 +16,51 @@ public class RectanglePredicate implements IShapePredicate {
 
     @Override
     public List<String> supportedParameters() {
-        return List.of("heightFrom", "heightTo", "widthFrom", "widthTo", "areFrom", "areaTo", "perimeterFrom", "perimeterTo",
-                "createdBy", "createdAtFrom", "createdAtTo", "type");
+        return List.of("heightFrom", "heightTo", "widthFrom", "widthTo", "areaFrom", "areaTo", "perimeterFrom", "perimeterTo");
+    }
+
+
+    @Override
+    public Boolean supportedParams(Map<String, String> parameters) {
+        return parameters.keySet().stream()
+                .anyMatch(x -> !supportedParameters().contains(x));
     }
 
     @Override
-    public Predicate createPredicate(Map<String, String> queryParams) {
-        QRectangle qRectangle = QRectangle.rectangle;
-        BooleanBuilder builder = new BooleanBuilder();
-        boolean hasUnsupportedParameters = queryParams.keySet().stream()
-                .anyMatch(x -> !supportedParameters().contains(x));
-        if (hasUnsupportedParameters) {
-            return qRectangle.isNull();
-        } else {
-            if (queryParams.containsKey("widthFrom")) {
-                builder.and(qRectangle.width.goe(Double.parseDouble(queryParams.get("widthFrom"))));
-            }
-            if (queryParams.containsKey("widthTo")) {
-                builder.and(qRectangle.width.loe(Double.parseDouble(queryParams.get("widthTo"))));
-            }
-            if (queryParams.containsKey("heightFrom")) {
-                builder.and(qRectangle.height.goe(Double.parseDouble(queryParams.get("heightFrom"))));
-            }
-            if (queryParams.containsKey("heightTo")) {
-                builder.and(qRectangle.height.loe(Double.parseDouble(queryParams.get("heightTo"))));
-            }
-            if (queryParams.containsKey("areaFrom")) {
-                builder.and(qRectangle.area.goe(Double.parseDouble(queryParams.get("areaFrom"))));
-            }
-            if (queryParams.containsKey("areaTo")) {
-                builder.and(qRectangle.area.loe(Double.parseDouble(queryParams.get("areaTo"))));
-            }
-            if (queryParams.containsKey("perimeterFrom")) {
-                builder.and(qRectangle.perimeter.goe(Double.parseDouble(queryParams.get("perimeterFrom"))));
-            }
-            if (queryParams.containsKey("perimeterTo")) {
-                builder.and(qRectangle.perimeter.goe(Double.parseDouble(queryParams.get("perimeterTo"))));
-            }
-            if (queryParams.containsKey("type")) {
-                builder.and(qRectangle.type.eq(queryParams.get("type")));
-            }
-            if (queryParams.containsKey("createdBy")) {
-                builder.and(qRectangle.createdBy.eq(queryParams.get("createdBy")));
-            }
-            if (queryParams.containsKey("createdAtFrom")) {
-                String createdAtFromString = queryParams.get("createdAtFrom");
-                Instant createdAtFrom = Instant.parse(createdAtFromString);
-                builder.and(qRectangle.createdAt.goe(createdAtFrom));
-            }
-            if (queryParams.containsKey("createdAtTo")) {
-                String createdAtFromString = queryParams.get("createdAtTo");
-                Instant createdAtFrom = Instant.parse(createdAtFromString);
-                builder.and(qRectangle.createdAt.loe(createdAtFrom));
-            }
-            return builder.getValue();
+    public Predicate buildPredicate(Root<Shape> root, CriteriaBuilder cb, Map<String, String> queryParams) {
+        Root<Rectangle> rectangleRoot = cb.treat(root, Rectangle.class);
+        Expression<Double> width = rectangleRoot.get("width").as(Double.class);
+        Expression<Double> height = rectangleRoot.get("height").as(Double.class);
+        Expression<Double> area = cb.prod(width, height);
+        Expression<Double> perimeter = cb.prod(cb.literal(2.0), cb.sum(width, height));
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (queryParams.containsKey("widthFrom")) {
+            predicates.add(cb.greaterThanOrEqualTo(width.as(Double.class), Double.valueOf(queryParams.get("widthFrom"))));
         }
+        if (queryParams.containsKey("widthTo")) {
+            predicates.add(cb.lessThanOrEqualTo(width.as(Double.class), Double.valueOf(queryParams.get("widthTo"))));
+        }
+        if (queryParams.containsKey("heightFrom")) {
+            predicates.add(cb.greaterThanOrEqualTo(height.as(Double.class), Double.valueOf(queryParams.get("heightFrom"))));
+        }
+        if (queryParams.containsKey("heightTo")) {
+            predicates.add(cb.lessThanOrEqualTo(height.as(Double.class), Double.valueOf(queryParams.get("heightTo"))));
+        }
+        if (queryParams.containsKey("areaFrom")) {
+            predicates.add(cb.greaterThanOrEqualTo(area.as(Double.class), Double.valueOf(queryParams.get("areaFrom"))));
+        }
+        if (queryParams.containsKey("areaTo")) {
+            predicates.add(cb.lessThanOrEqualTo(area.as(Double.class), Double.valueOf(queryParams.get("areaTo"))));
+        }
+        if (queryParams.containsKey("perimeterFrom")) {
+            predicates.add(cb.greaterThanOrEqualTo(perimeter.as(Double.class), Double.valueOf(queryParams.get("perimeterFrom"))));
+        }
+        if (queryParams.containsKey("perimeterTo")) {
+            predicates.add(cb.lessThanOrEqualTo(perimeter.as(Double.class), Double.valueOf(queryParams.get("perimeterTo"))));
+        }
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
 }
+
 

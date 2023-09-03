@@ -1,6 +1,9 @@
 package pl.kurs.finaltest.controllers;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,13 +12,9 @@ import pl.kurs.finaltest.dto.ShapeDto;
 import pl.kurs.finaltest.models.*;
 import pl.kurs.finaltest.services.ShapeFactoryService;
 import pl.kurs.finaltest.services.ShapeManagementService;
-import pl.kurs.finaltest.utils.UriParametersExtractor;
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 
 @RestController
 @RequestMapping("/api/v1/shapes")
@@ -41,17 +40,18 @@ public class ShapeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(shapeDto);
     }
 
+
     @GetMapping
-    public ResponseEntity<List<ShapeDto>> getShapes(HttpServletRequest httpRequest) throws UnsupportedEncodingException {
-        String uri = httpRequest.getQueryString();
-        Map<String,String> shapeParameters = UriParametersExtractor.extractQueryParams(uri);
-        List<Shape> allShapes = shapeManagementService.getAllShapes(shapeParameters);
+    public ResponseEntity<PageImpl<ShapeDto>> getShapes(@RequestParam Map<String, String> parameters, @PageableDefault Pageable pageable) {
+        List<Shape> allShapes = shapeManagementService.getAllShapes(parameters);
         List<ShapeDto> allShapesDto = allShapes.stream()
                 .map(x -> {
                     IShapeFactory shapeFactory = shapeFactoryService.getFactory(x.getType());
                     return mapper.map(x, shapeFactory.createShapeDto(x));
                 })
                 .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(allShapesDto);
+        PageImpl<ShapeDto> shapeDtoPage = new PageImpl<>(allShapesDto, pageable, allShapes.size());
+        return ResponseEntity.status(HttpStatus.OK).body(shapeDtoPage);
     }
+
 }

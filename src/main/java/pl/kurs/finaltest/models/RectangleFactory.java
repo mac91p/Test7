@@ -32,8 +32,6 @@ public class RectangleFactory implements IShapeFactory {
                 rectangle.setType(command.getType().toUpperCase(Locale.ROOT));
                 rectangle.setWidth(width);
                 rectangle.setHeight(height);
-                rectangle.setArea(rectangle.calculateArea());
-                rectangle.setPerimeter(rectangle.calculatePerimeter());
                 return rectangle;
             }
             throw new IllegalArgumentException("Invalid parameters for this type of shape");

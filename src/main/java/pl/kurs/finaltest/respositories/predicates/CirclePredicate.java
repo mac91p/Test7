@@ -1,10 +1,10 @@
 package pl.kurs.finaltest.respositories.predicates;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Component;
-import pl.kurs.finaltest.models.QCircle;
-import java.time.Instant;
+import pl.kurs.finaltest.models.Circle;
+import pl.kurs.finaltest.models.Shape;
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,56 +13,45 @@ public class CirclePredicate implements IShapePredicate {
 
     @Override
     public List<String> supportedParameters() {
-        return List.of("radiusFrom", "radiusTo", "areFrom", "areaTo", "perimeterFrom", "perimeterTo",
-                "createdBy", "createdAtFrom", "createdAtTo", "type");
+        return List.of("radiusFrom", "radiusTo", "areaFrom", "areaTo", "perimeterFrom", "perimeterTo");
+    }
+
+
+    @Override
+    public Boolean supportedParams(Map<String, String> parameters) {
+        return parameters.keySet().stream()
+                .anyMatch(x -> !supportedParameters().contains(x));
     }
 
     @Override
-    public Predicate createPredicate(Map<String, String> queryParams) {
-        QCircle qCircle = QCircle.circle;
-        BooleanBuilder builder = new BooleanBuilder();
-        boolean hasUnsupportedParameters = queryParams.keySet().stream()
-                .anyMatch(x -> !supportedParameters().contains(x));
-        if (hasUnsupportedParameters) {
-            return qCircle.isNull();
-        } else {
-            if (queryParams.containsKey("radiusFrom")) {
-                builder.and(qCircle.radius.goe(Double.parseDouble(queryParams.get("radiusFrom"))));
-            }
-            if (queryParams.containsKey("radiusTo")) {
-                builder.and(qCircle.radius.loe(Double.parseDouble(queryParams.get("radiusTo"))));
-            }
-            if (queryParams.containsKey("areaFrom")) {
-                builder.and(qCircle.area.goe(Double.parseDouble(queryParams.get("areaFrom"))));
-            }
-            if (queryParams.containsKey("areaTo")) {
-                builder.and(qCircle.area.loe(Double.parseDouble(queryParams.get("areaTo"))));
-            }
-            if (queryParams.containsKey("perimeterFrom")) {
-                builder.and(qCircle.perimeter.goe(Double.parseDouble(queryParams.get("perimeterFrom"))));
-            }
-            if (queryParams.containsKey("perimeterTo")) {
-                builder.and(qCircle.perimeter.goe(Double.parseDouble(queryParams.get("perimeterTo"))));
-            }
-            if (queryParams.containsKey("type")) {
-                builder.and(qCircle.type.eq(queryParams.get("type")));
-            }
-            if (queryParams.containsKey("createdBy")) {
-                builder.and(qCircle.createdBy.eq(queryParams.get("createdBy")));
-            }
-            if (queryParams.containsKey("createdAtFrom")) {
-                String createdAtFromString = queryParams.get("createdAtFrom");
-                Instant createdAtFrom = Instant.parse(createdAtFromString);
-                builder.and(qCircle.createdAt.goe(createdAtFrom));
-            }
-            if (queryParams.containsKey("createdAtTo")) {
-                String createdAtFromString = queryParams.get("createdAtTo");
-                Instant createdAtFrom = Instant.parse(createdAtFromString);
-                builder.and(qCircle.createdAt.goe(createdAtFrom));
-            }
-            return builder.getValue();
+    public Predicate buildPredicate(Root<Shape> root, CriteriaBuilder cb, Map<String, String> queryParams) {
+        Root<Circle> circleRoot = cb.treat(root, Circle.class);
+        Expression<Double> radius = circleRoot.get("radius").as(Double.class);
+        Expression<Double> area = cb.prod(cb.literal(Math.PI), cb.prod(radius, radius));
+        Expression<Double> perimeter = cb.prod(cb.literal(2 * Math.PI), radius);
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (queryParams.containsKey("radiusFrom")) {
+            predicates.add(cb.greaterThanOrEqualTo(circleRoot.get("radius"), Double.valueOf(queryParams.get("radiusFrom"))));
         }
+        if (queryParams.containsKey("radiusTo")) {
+            predicates.add(cb.lessThanOrEqualTo(circleRoot.get("radius"), Double.valueOf(queryParams.get("radiusTo"))));
+        }
+        if (queryParams.containsKey("areaFrom")) {
+            predicates.add(cb.greaterThanOrEqualTo(area.as(Double.class), Double.valueOf(queryParams.get("areaFrom"))));
+        }
+        if (queryParams.containsKey("areaTo")) {
+            predicates.add(cb.lessThanOrEqualTo(area.as(Double.class), Double.valueOf(queryParams.get("areaTo"))));
+        }
+        if (queryParams.containsKey("perimeterFrom")) {
+            predicates.add(cb.greaterThanOrEqualTo(perimeter.as(Double.class), Double.valueOf(queryParams.get("perimeterFrom"))));
+        }
+        if (queryParams.containsKey("perimeterTo")) {
+            predicates.add(cb.lessThanOrEqualTo(perimeter.as(Double.class), Double.valueOf(queryParams.get("perimeterTo"))));
+        }
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
 }
+
 
 

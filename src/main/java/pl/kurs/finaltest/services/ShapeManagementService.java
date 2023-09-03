@@ -1,35 +1,27 @@
 package pl.kurs.finaltest.services;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.kurs.finaltest.models.*;
 import pl.kurs.finaltest.respositories.ShapeRepository;
-import java.util.ArrayList;
+import pl.kurs.finaltest.respositories.predicates.IShapePredicate;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class ShapeManagementService extends AbstractGenericManagementService<Shape, ShapeRepository> {
 
-    private final List<IShapeProviderService> shapeProviderServices;
-    private final JPAQueryFactory queryFactory;
 
-    @Autowired
-    public ShapeManagementService(ShapeRepository repository, List<IShapeProviderService> shapeProviderServices, JPAQueryFactory queryFactory) {
+    private final List<IShapePredicate> shapePredicates;
+    private ShapeSpecificationService shapeSpecificationService;
+
+    public ShapeManagementService(ShapeRepository repository, List<IShapePredicate> shapePredicates, ShapeSpecificationService shapeSpecificationService) {
         super(repository);
-        this.shapeProviderServices = shapeProviderServices;
-        this.queryFactory = queryFactory;
+        this.shapePredicates = shapePredicates;
+        this.shapeSpecificationService = shapeSpecificationService;
     }
 
-
-    public List<Shape> getAllShapes(Map<String, String> queryParams) {
-        List<Shape> allShapes = new ArrayList<>();
-        for (IShapeProviderService shapeProviderService : shapeProviderServices) {
-            List<? extends Shape> shapes = shapeProviderService.getShapes(queryParams, queryFactory);
-            allShapes.addAll(shapes);
-        }
-        return allShapes;
+    public List<Shape> getAllShapes(Map<String,String> parameters) {
+        return repository.findAll(shapeSpecificationService.getCombinedSpecification(parameters));
     }
 
 }

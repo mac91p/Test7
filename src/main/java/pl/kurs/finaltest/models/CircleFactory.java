@@ -18,8 +18,6 @@ public class CircleFactory implements IShapeFactory {
                 Circle circle = new Circle();
                 circle.setType(command.getType().toUpperCase(Locale.ROOT));
                 circle.setRadius(radius);
-                circle.setArea(circle.calculateArea());
-                circle.setPerimeter(circle.calculatePerimeter());
                 return circle;
             }
             throw new IllegalArgumentException("Invalid parameters for this shape");
@@ -32,10 +30,6 @@ public class CircleFactory implements IShapeFactory {
         return "CIRCLE";
     }
 
-//    @Override
-//    public ShapeDto createShapeDto(Shape shape) {
-//        return new CircleDto();
-//    }
 
     @Override
     public Class<? extends ShapeDto> createShapeDto(Shape shape) {
